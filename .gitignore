@@ -1,0 +1,42 @@
+/.bundle/
+/.yardoc
+/_yardoc/
+/coverage/
+/doc/
+/pkg/
+/spec/reports/
+/tmp/
+
+# rspec failure tracking
+.rspec_status
+
+*.gem
+*.rbc
+.config
+.yardoc
+Gemfile.lock
+InstalledFiles
+_yardoc
+coverage
+doc/
+lib/bundler/man
+pkg
+rdoc
+spec/reports
+test/tmp
+test/version_tmp
+tmp
+
+# Used by dotenv library
+.env
+.env.*
+!.env.example
+
+# Ignore master key for decrypting credentials
+/config/master.key
+
+# Ignore bundler cache
+vendor/bundle
+
+# Mac
+.DS_Store
