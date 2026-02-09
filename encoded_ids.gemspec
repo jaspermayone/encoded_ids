@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
-require_relative "lib/identifiable/version"
+require_relative "lib/encoded_ids/version"
 
 Gem::Specification.new do |spec|
-  spec.name = "identifiable"
-  spec.version = Identifiable::VERSION
+  spec.name = "encoded_ids"
+  spec.version = EncodedIds::VERSION
   spec.authors = ["Jasper Mayone"]
   spec.email = ["me@jaspermayone.com"]
 
   spec.summary = "Stripe-like public IDs for Rails models"
   spec.description = "Provides Stripe-style public identifiers (like usr_abc123) for Rails models using hashids or base62 encoding. Supports both integer and UUID primary keys, with automatic URL parameter handling and controller helpers."
-  spec.homepage = "https://github.com/jaspermayone/identifiable"
+  spec.homepage = "https://github.com/jaspermayone/encoded_ids"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.0.0"
 

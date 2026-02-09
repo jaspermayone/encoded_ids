@@ -1,4 +1,4 @@
-# Identifiable
+# EncodedIds
 
 Stripe-like public IDs for Rails models. Generate API-friendly identifiers like `usr_k5qx9z` or `org_4k8xJm2pN9qW` that:
 
@@ -12,13 +12,13 @@ Stripe-like public IDs for Rails models. Generate API-friendly identifiers like 
 Add to your Gemfile:
 
 ```ruby
-gem 'identifiable'
+gem 'encoded_ids'
 ```
 
 Or install directly:
 
 ```bash
-gem install identifiable
+gem install encoded_ids
 ```
 
 ## Quick Start
@@ -27,7 +27,7 @@ gem install identifiable
 
 ```ruby
 class User < ApplicationRecord
-  include Identifiable::HashidIdentifiable
+  include EncodedIds::HashidIdentifiable
   set_public_id_prefix :usr
 end
 
@@ -45,7 +45,7 @@ User.find_by_public_id("usr_k5qx9z")  # => <User id: 1>
 
 ```ruby
 class Organization < ApplicationRecord
-  include Identifiable::UuidIdentifiable
+  include EncodedIds::UuidIdentifiable
   set_public_id_prefix "org"
 end
 
@@ -93,7 +93,7 @@ For namespaced models, you can build prefixes from multiple segments:
 
 ```ruby
 class Intel::Tool::PhoneNumber < ApplicationRecord
-  include Identifiable::HashidIdentifiable
+  include EncodedIds::HashidIdentifiable
   add_public_id_segment :int
   add_public_id_segment :tool
   add_public_id_segment :phn
@@ -108,7 +108,7 @@ For tables with many records, increase the minimum hash length:
 
 ```ruby
 class Enrollment < ApplicationRecord
-  include Identifiable::HashidIdentifiable
+  include EncodedIds::HashidIdentifiable
   set_public_id_prefix :enr, min_hash_length: 12
 end
 
@@ -122,13 +122,13 @@ By default, `to_param` returns just the hash (no prefix) for cleaner URLs. You c
 
 ```ruby
 # Global configuration - include prefix in all URLs (Stripe style)
-Identifiable.configure do |config|
+EncodedIds.configure do |config|
   config.use_prefix_in_routes = true
 end
 
 # Per-model override
 class User < ApplicationRecord
-  include Identifiable::HashidIdentifiable
+  include EncodedIds::HashidIdentifiable
   set_public_id_prefix :usr, use_prefix_in_routes: true
 end
 
@@ -153,10 +153,10 @@ end
 
 ## Configuration
 
-Create an initializer at `config/initializers/identifiable.rb`:
+Create an initializer at `config/initializers/encoded_ids.rb`:
 
 ```ruby
-Identifiable.configure do |config|
+EncodedIds.configure do |config|
   # Hashid configuration (for integer IDs)
   config.hashid_salt = Rails.application.credentials.dig(:hashid, :salt)
   config.hashid_min_length = 8
@@ -226,11 +226,11 @@ find_by_any_id!(Model, id)  # Returns record or raises RecordNotFound
 
 If you have existing `PublicIdentifiable` concerns in your app:
 
-1. Add `identifiable` to your Gemfile
+1. Add `encoded_ids` to your Gemfile
 2. Replace `include PublicIdentifiable` with:
-   - `include Identifiable::HashidIdentifiable` (for integer IDs)
-   - `include Identifiable::UuidIdentifiable` (for UUID IDs)
-3. Update your hashid initializer to use `Identifiable.configure`
+   - `include EncodedIds::HashidIdentifiable` (for integer IDs)
+   - `include EncodedIds::UuidIdentifiable` (for UUID IDs)
+3. Update your hashid initializer to use `EncodedIds.configure`
 4. Remove your old `PublicIdentifiable` concern
 5. Controllers automatically get the helper methods
 
@@ -251,4 +251,4 @@ MIT
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/jaspermayone/identifiable
+Bug reports and pull requests are welcome on GitHub at https://github.com/jaspermayone/encoded_ids

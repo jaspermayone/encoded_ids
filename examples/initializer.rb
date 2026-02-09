@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-# Example configuration for config/initializers/identifiable.rb
+# Example configuration for config/initializers/encoded_ids.rb
 #
 # Copy this file to your Rails app's config/initializers/ directory
 # and customize as needed.
 
-Identifiable.configure do |config|
+EncodedIds.configure do |config|
   # Hashid configuration (for integer IDs)
   # IMPORTANT: Set a unique salt in production via credentials
   # rails credentials:edit

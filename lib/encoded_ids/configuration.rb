@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Identifiable
+module EncodedIds
   class Configuration
     # Hashid configuration
     attr_accessor :hashid_salt, :hashid_min_length, :hashid_alphabet

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Identifiable
+module EncodedIds
   # Controller helpers for looking up records by either internal ID or public_id
   #
   # Automatically included in all controllers via Railtie
@@ -20,7 +20,7 @@ module Identifiable
       return nil if id.blank?
 
       # If it contains the separator, it's a full public_id with prefix
-      if id.to_s.include?(Identifiable.configuration.separator)
+      if id.to_s.include?(EncodedIds.configuration.separator)
         model_class.find_by_public_id(id)
       else
         # Use the model's find method which handles both hashids and regular IDs

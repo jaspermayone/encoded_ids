@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-module Identifiable
-  # PublicIdentifiable for models with integer primary keys using hashids
+module EncodedIds
+  # HashidIdentifiable for models with integer primary keys using hashids
   #
   # Usage:
   #   class User < ApplicationRecord
-  #     include Identifiable::HashidIdentifiable
+  #     include EncodedIds::HashidIdentifiable
   #     set_public_id_prefix :usr
   #   end
   #
@@ -15,7 +15,7 @@ module Identifiable
   #
   # Compositional prefixes:
   #   class Intel::Tool::PhoneNumber < ApplicationRecord
-  #     include Identifiable::HashidIdentifiable
+  #     include EncodedIds::HashidIdentifiable
   #     add_public_id_segment :int
   #     add_public_id_segment :tool
   #     add_public_id_segment :phn
@@ -42,14 +42,14 @@ module Identifiable
     # Respects use_prefix_in_routes configuration
     def to_param
       use_prefix = self.class.use_prefix_in_routes.nil? ?
-        Identifiable.configuration.use_prefix_in_routes :
+        EncodedIds.configuration.use_prefix_in_routes :
         self.class.use_prefix_in_routes
 
       use_prefix ? public_id : hashid
     end
 
     def separator
-      Identifiable.configuration.separator
+      EncodedIds.configuration.separator
     end
 
     module ClassMethods
@@ -73,7 +73,7 @@ module Identifiable
         id = args.first
 
         # If it's a public_id string (with prefix), find by public_id
-        if id.is_a?(String) && id.include?(Identifiable.configuration.separator)
+        if id.is_a?(String) && id.include?(EncodedIds.configuration.separator)
           find_by_public_id!(id)
         # If it's a string (just the hash without prefix), try finding by hashid
         elsif id.is_a?(String)
@@ -89,9 +89,9 @@ module Identifiable
       def find_by_public_id(id)
         return nil unless id.is_a?(String)
 
-        parts = id.split(Identifiable.configuration.separator)
+        parts = id.split(EncodedIds.configuration.separator)
         hash = parts.pop  # last part is always the hash
-        prefix = parts.join(Identifiable.configuration.separator)
+        prefix = parts.join(EncodedIds.configuration.separator)
 
         return nil unless prefix == get_public_id_prefix
 
@@ -107,7 +107,7 @@ module Identifiable
 
       def get_public_id_prefix
         # Segments take precedence if defined
-        return public_id_segments.join(Identifiable.configuration.separator) if public_id_segments.present?
+        return public_id_segments.join(EncodedIds.configuration.separator) if public_id_segments.present?
         return public_id_prefix.to_s.downcase if public_id_prefix.present?
 
         raise NotImplementedError, "The #{name} model includes #{self.class.name}, but no prefix has been set. Use set_public_id_prefix or add_public_id_segment."

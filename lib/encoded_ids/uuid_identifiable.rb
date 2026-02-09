@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module Identifiable
-  # PublicIdentifiable for models with UUID primary keys using base62 encoding
+module EncodedIds
+  # UuidIdentifiable for models with UUID primary keys using base62 encoding
   #
   # Since UUIDs are already non-sequential and random, this focuses on:
   # 1. Adding a type prefix for easy identification
@@ -10,7 +10,7 @@ module Identifiable
   #
   # Usage:
   #   class User < ApplicationRecord
-  #     include Identifiable::UuidIdentifiable
+  #     include EncodedIds::UuidIdentifiable
   #     set_public_id_prefix "usr"
   #   end
   #
@@ -41,14 +41,14 @@ module Identifiable
     # Respects use_prefix_in_routes configuration
     def to_param
       use_prefix = self.class.use_prefix_in_routes.nil? ?
-        Identifiable.configuration.use_prefix_in_routes :
+        EncodedIds.configuration.use_prefix_in_routes :
         self.class.use_prefix_in_routes
 
       use_prefix ? public_id : encoded_id
     end
 
     def separator
-      Identifiable.configuration.separator
+      EncodedIds.configuration.separator
     end
 
     # Alias for Rails conventions
@@ -72,7 +72,7 @@ module Identifiable
         id = args.first
 
         # If it's a public_id string (with prefix), find by public_id
-        if id.is_a?(String) && id.include?(Identifiable.configuration.separator)
+        if id.is_a?(String) && id.include?(EncodedIds.configuration.separator)
           find_by_public_id!(id)
         # If it's a string that looks like an encoded UUID (not a standard UUID format)
         elsif id.is_a?(String) && !id.match?(/\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/i)
@@ -90,7 +90,7 @@ module Identifiable
         return nil if public_id.blank?
 
         prefix = get_public_id_prefix
-        separator = Identifiable.configuration.separator
+        separator = EncodedIds.configuration.separator
         return nil unless public_id.to_s.start_with?("#{prefix}#{separator}")
 
         encoded = public_id.to_s.sub("#{prefix}#{separator}", "")
@@ -108,7 +108,7 @@ module Identifiable
       # Check if a string looks like a valid public ID for this model
       def valid_public_id?(public_id)
         return false if public_id.blank?
-        separator = Identifiable.configuration.separator
+        separator = EncodedIds.configuration.separator
         public_id.to_s.start_with?("#{get_public_id_prefix}#{separator}")
       end
 
@@ -116,7 +116,7 @@ module Identifiable
       def encode_uuid(uuid)
         return nil if uuid.blank?
 
-        alphabet = Identifiable.configuration.base62_alphabet
+        alphabet = EncodedIds.configuration.base62_alphabet
 
         # Remove hyphens and convert to integer
         hex = uuid.to_s.delete("-")
@@ -138,7 +138,7 @@ module Identifiable
       def decode_to_uuid(encoded)
         return nil if encoded.blank?
 
-        alphabet = Identifiable.configuration.base62_alphabet
+        alphabet = EncodedIds.configuration.base62_alphabet
 
         # Convert from base62 to integer
         num = 0
