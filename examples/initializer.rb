@@ -7,11 +7,25 @@
 
 EncodedIds.configure do |config|
   # Hashid configuration (for integer IDs)
-  # IMPORTANT: Set a unique salt in production via credentials
-  # rails credentials:edit
-  # Add: hashid: { salt: "your-unique-salt-here" }
-  config.hashid_salt = Rails.application.credentials.dig(:hashid, :salt)
+  #
+  # SECURITY IMPORTANT: Set a unique salt for your application!
+  # Without a salt, hash IDs can be calculated by anyone who knows your database IDs.
+  #
+  # Method 1 (Recommended): Store in encrypted credentials
+  #   rails credentials:edit
+  #   Add: hashid: { salt: "your-unique-salt-here" }
+  #   Generate with: SecureRandom.hex(32)
+  #
+  # Method 2: Use environment variable
+  #   config.hashid_salt = ENV["HASHID_SALT"]
+  #
+  # Method 3: Mix of both (credentials preferred, ENV as fallback)
+  config.hashid_salt = Rails.application.credentials.dig(:hashid, :salt) || ENV["HASHID_SALT"]
+
+  # Minimum length of the hash portion (before prefix)
   config.hashid_min_length = 8
+
+  # Character set for hash generation (lowercase + numbers by default)
   config.hashid_alphabet = "abcdefghijklmnopqrstuvwxyz0123456789"
 
   # Base62 alphabet (for UUID encoding)

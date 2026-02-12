@@ -54,13 +54,19 @@ module EncodedIds
 
     module ClassMethods
       # Simple approach: set the full prefix directly
-      def set_public_id_prefix(prefix, min_hash_length: 8, use_prefix_in_routes: nil)
+      # Options:
+      #   - min_hash_length: Minimum length of the encoded hash (default: 8)
+      #   - use_prefix_in_routes: Include prefix in to_param URLs (default: nil, inherits from config)
+      #   - salt: Custom salt for this model (default: nil, uses global config)
+      def set_public_id_prefix(prefix, min_hash_length: 8, use_prefix_in_routes: nil, salt: nil)
         self.public_id_prefix = prefix.to_s.downcase
         self.hashid_min_length = min_hash_length
         self.use_prefix_in_routes = use_prefix_in_routes
 
-        # Configure hashid-rails for this model with custom length
-        hashid_config(min_hash_length: min_hash_length)
+        # Configure hashid-rails for this model with custom length and optional salt
+        config_options = { min_hash_length: min_hash_length }
+        config_options[:salt] = salt if salt
+        hashid_config(config_options)
       end
 
       # Compositional approach: add segments that get joined with underscores

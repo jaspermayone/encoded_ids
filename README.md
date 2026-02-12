@@ -158,7 +158,8 @@ Create an initializer at `config/initializers/encoded_ids.rb`:
 ```ruby
 EncodedIds.configure do |config|
   # Hashid configuration (for integer IDs)
-  config.hashid_salt = Rails.application.credentials.dig(:hashid, :salt)
+  # SECURITY IMPORTANT: Set a unique salt! See Security section below.
+  config.hashid_salt = Rails.application.credentials.dig(:hashid, :salt) || ENV["HASHID_SALT"]
   config.hashid_min_length = 8
   config.hashid_alphabet = "abcdefghijklmnopqrstuvwxyz0123456789"
 
@@ -175,15 +176,48 @@ EncodedIds.configure do |config|
 end
 ```
 
-**Important:** For production, set a unique `hashid_salt` in your credentials:
+### Security: Configuring Your Salt
+
+**IMPORTANT:** Without a unique salt, hash IDs can be calculated by anyone who knows your database IDs, making them only marginally better than exposing raw IDs.
+
+The gem uses a fallback chain for the salt:
+1. `EncodedIds.configuration.hashid_salt` (set in initializer)
+2. `Rails.application.credentials.dig(:hashid, :salt)` (recommended)
+3. `ENV["HASHID_SALT"]`
+4. `Rails.application.secret_key_base` (not recommended - shows warning in development)
+
+**Recommended setup:**
 
 ```bash
+# Generate a unique salt
 rails credentials:edit
 ```
 
+Add to your credentials:
 ```yaml
 hashid:
-  salt: your-unique-salt-here  # Generate with: SecureRandom.hex(32)
+  salt: <paste output of: SecureRandom.hex(32)>  # e.g., "a1b2c3d4e5f6..."
+```
+
+The initializer will automatically pick it up:
+```ruby
+config.hashid_salt = Rails.application.credentials.dig(:hashid, :salt)
+```
+
+**Per-model salt override:**
+
+For models that need different salts (e.g., to maintain compatibility with legacy IDs):
+
+```ruby
+class LegacyUser < ApplicationRecord
+  include EncodedIds::HashidIdentifiable
+  set_public_id_prefix :usr, salt: "" # Empty salt for backward compatibility
+end
+
+class SecureDocument < ApplicationRecord
+  include EncodedIds::HashidIdentifiable
+  set_public_id_prefix :doc, salt: Rails.application.credentials.dig(:documents, :salt)
+end
 ```
 
 ## How It Works
